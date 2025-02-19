@@ -86,7 +86,7 @@ def process_excel(filepath):
         data['index'] = np.arange(len(data))
         X, y = data[['index']], data['sales']
         model = LinearRegression().fit(X, y)
-        return float(model.predict([[len(data)]])[0])  # Ensure it's a native float
+        return float(model.predict([[len(data)]])[0])
 
     predictions = {
         "daily": predict_sales(daily_sales),
@@ -94,8 +94,10 @@ def process_excel(filepath):
         "yearly": predict_sales(yearly_sales)
     }
 
+    # Extract daily details for search functionality
+    daily_details = df[['day', 'product', 'sales', 'cogs', 'profit']].values.tolist()
+
     def convert_numpy(obj):
-        """Convert numpy types to native Python types for JSON serialization."""
         if isinstance(obj, np.integer):
             return int(obj)
         elif isinstance(obj, np.floating):
@@ -116,6 +118,7 @@ def process_excel(filepath):
         "lowSalesProducts": {"headers": ["Product", "Total Sales"], "rows": low_sales_products},
         "growthAnalysis": growth_data,
         "predictedSales": predictions,
+        "dailyDetails": daily_details,  # <-- Added for search functionality
         "summary": "Financial analysis completed."
     }
 
