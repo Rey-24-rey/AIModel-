@@ -9,7 +9,9 @@ import logging
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
+
+# Enable CORS for all routes and origins
+CORS(app, resources={r"/*": {"origins": "*"}})
 logging.basicConfig(level=logging.INFO)
 
 # Define Uploads Directory
@@ -123,6 +125,14 @@ def process_excel(filepath):
     }
 
     return jsonify(convert_numpy(response_data))
+
+# Optional: Add an after-request hook to ensure all responses include CORS headers
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS'
+    return response
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
